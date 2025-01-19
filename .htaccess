@@ -1,0 +1,65 @@
+#remove php file extension-e.g. https://example.com/file.php will become https://example.com/file
+RewriteEngine on 
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [NC,L]
+
+
+
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+
+#ErrorDocument 404 /
+#ErrorDocument 500 /
+#RewriteEngine On
+#RewriteCond %{HTTPS} off [OR]
+#RewriteCond %{HTTP_HOST} ^www\. [NC]
+#RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+#RewriteRule ^ https://%1%{REQUEST_URI} [L,NE,R=301]
+
+
+# browser requests PHP
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^\ ]+)\.php
+RewriteRule ^/?(.*)\.php$ /$1 [L,R=301]
+
+
+
+#Customize expires caching start - adjust the period according to your needs
+<IfModule mod_expires.c>
+  FileETag MTime Size
+  AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/xml application/xhtml+xml application/rss+xml application/javascript application/x-javascript
+  ExpiresActive On
+  ExpiresByType text/html "access 600 seconds"
+  ExpiresByType application/xhtml+xml "access 600 seconds"
+  ExpiresByType text/css "access 1 month"
+  ExpiresByType text/javascript "access 1 month"
+  ExpiresByType text/x-javascript "access 1 month"
+  ExpiresByType application/javascript "access 1 month"
+  ExpiresByType application/x-javascript "access 1 month"
+  ExpiresByType application/x-shockwave-flash "access 1 month"
+  ExpiresByType application/pdf "access 1 month"
+  ExpiresByType image/x-icon "access 1 year"
+  ExpiresDefault "access 1 month"
+</IfModule>
+#Expires caching end
+
+
+
+# BEGIN Cache-Control Headers
+<IfModule mod_expires.c>
+  <IfModule mod_headers.c>
+    <filesMatch "\.(ico|jpe?g|png|gif|swf)$">
+      Header append Cache-Control "public"  
+    </filesMatch>
+    <filesMatch "\.(css)$">
+      Header append Cache-Control "public"
+    </filesMatch>
+    <filesMatch "\.(js)$">
+      Header append Cache-Control "private"
+    </filesMatch>
+    <filesMatch "\.(x?html?|php)$">
+      Header append Cache-Control "private, must-revalidate"
+    </filesMatch>
+  </IfModule>
+</IfModule>
