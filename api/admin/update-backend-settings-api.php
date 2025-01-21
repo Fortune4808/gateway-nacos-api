@@ -20,8 +20,8 @@ if($apiKey!=$expected_api_key){
         $response['message']='Invalid AccessToken. Please LogIn Again.'; 
     }else{
 
-        $nacos_fee_amount=trim($_POST['nacos_fee_amount']);
-        $departmental_fee_amount=trim($_POST['departmental_fee_amount']);
+        $nacos_fee_amount = preg_replace('/[^0-9\.]/', '', trim($_POST['nacos_fee_amount']));
+        $departmental_fee_amount = preg_replace('/[^0-9\.]/', '', trim($_POST['departmental_fee_amount']));
         $smtp_host=strtoupper(trim($_POST['smtp_host']));
         $smtp_username=strtoupper(trim($_POST['smtp_username']));
         $smtp_password=trim($_POST['smtp_password']);
@@ -38,23 +38,12 @@ if($apiKey!=$expected_api_key){
 
         }else{
 
-            $nacos_fee_amount = $callclass->validatePhoneNumber($nacos_fee_amount);
-            $departmental_fee_amount = $callclass->validatePhoneNumber($departmental_fee_amount);
-
-            if (!$nacos_fee_amount){
+            if (!is_numeric($nacos_fee_amount) || !is_numeric($departmental_fee_amount)) {
 
                 $response = [
                     'response' => 103,
                     'success' => false,
-                    'message' => "Invalid Input. Please ensure you input a valid amount"
-                ];
-
-            }elseif (!$departmental_fee_amount){
-
-                $response = [
-                    'response' => 105,
-                    'success' => false,
-                    'message' => "Invalid Input. Please ensure you input a valid amount"
+                    'message' => "Invalid amount. Please ensure you input valid amounts."
                 ];
 
             }else{
@@ -62,32 +51,33 @@ if($apiKey!=$expected_api_key){
                 if (!filter_var($support_email, FILTER_VALIDATE_EMAIL)){
 
                     $response = [
-                        'response' => 106,
+                        'response' => 105,
                         'success' => false,
                         'message' => "Invalid Support Email Address."
                     ];
-
+    
                 }else{
                         
                     $query = mysqli_prepare($conn, "UPDATE setup_system_setting_tab SET nacos_fee_amount=?, departmental_fee_amount=?, smtp_host=?, smtp_username=?, smtp_password=?, smtp_port=?, support_email=?") or die(mysqli_error($conn));
-                    mysqli_stmt_bind_param($query, 'iisssss', $nacos_fee_amount, $departmental_fee_amount, $smtp_host, $smtp_username, $smtp_password, $smtp_port, $support_email);
-
+                    mysqli_stmt_bind_param($query, 'iisssis', $nacos_fee_amount, $departmental_fee_amount, $smtp_host, $smtp_username, $smtp_password, $smtp_port, $support_email);
+    
                     if (mysqli_stmt_execute($query)){
                         $response = [
-                            'response' => 108,
+                            'response' => 106,
                             'success' => true,
                             'message' => "System Settings Successfully Updated."
                         ];
                     } else {
                         $response = [
-                            'response' => 109,
+                            'response' => 107,
                             'success' => false,
                             'message' => "Error updating data: " . mysqli_error($conn)
                         ];
                     }
-                        
+                            
                 }
             }
+            
         }
 
     }
