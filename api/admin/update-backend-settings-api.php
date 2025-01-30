@@ -38,44 +38,34 @@ if($apiKey!=$expected_api_key){
 
         }else{
 
-            if (!is_numeric($nacos_fee_amount) || !is_numeric($departmental_fee_amount)) {
+
+            if (!filter_var($support_email, FILTER_VALIDATE_EMAIL)){
 
                 $response = [
                     'response' => 103,
                     'success' => false,
-                    'message' => "Invalid amount. Please ensure you input valid amounts."
+                    'message' => "Invalid Support Email Address."
                 ];
 
             }else{
+                    
+                $query = mysqli_prepare($conn, "UPDATE setup_system_setting_tab SET nacos_fee_amount=?, departmental_fee_amount=?, smtp_host=?, smtp_username=?, smtp_password=?, smtp_port=?, support_email=?") or die(mysqli_error($conn));
+                mysqli_stmt_bind_param($query, 'iisssis', $nacos_fee_amount, $departmental_fee_amount, $smtp_host, $smtp_username, $smtp_password, $smtp_port, $support_email);
 
-                if (!filter_var($support_email, FILTER_VALIDATE_EMAIL)){
-
+                if (mysqli_stmt_execute($query)){
+                    $response = [
+                        'response' => 104,
+                        'success' => true,
+                        'message' => "System Settings Successfully Updated."
+                    ];
+                } else {
                     $response = [
                         'response' => 105,
                         'success' => false,
-                        'message' => "Invalid Support Email Address."
+                        'message' => "Error updating data: " . mysqli_error($conn)
                     ];
-    
-                }else{
-                        
-                    $query = mysqli_prepare($conn, "UPDATE setup_system_setting_tab SET nacos_fee_amount=?, departmental_fee_amount=?, smtp_host=?, smtp_username=?, smtp_password=?, smtp_port=?, support_email=?") or die(mysqli_error($conn));
-                    mysqli_stmt_bind_param($query, 'iisssis', $nacos_fee_amount, $departmental_fee_amount, $smtp_host, $smtp_username, $smtp_password, $smtp_port, $support_email);
-    
-                    if (mysqli_stmt_execute($query)){
-                        $response = [
-                            'response' => 106,
-                            'success' => true,
-                            'message' => "System Settings Successfully Updated."
-                        ];
-                    } else {
-                        $response = [
-                            'response' => 107,
-                            'success' => false,
-                            'message' => "Error updating data: " . mysqli_error($conn)
-                        ];
-                    }
-                            
                 }
+                        
             }
             
         }

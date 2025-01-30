@@ -25,7 +25,7 @@ if ($apiKey != $expected_api_key) {
 
     }else{
 
-        $otpcheck=mysqli_prepare($conn,"SELECT * FROM staff_tab WHERE staff_id=? AND otp=?");
+        $otpcheck=mysqli_prepare($conn,"SELECT a.*, b.department_id FROM staff_tab a JOIN staff_department_tab b ON a.staff_id = b.staff_id WHERE a.staff_id=? AND a.otp=?");
         mysqli_stmt_bind_param($otpcheck, 'si', $staff_id, $otp);
         mysqli_stmt_execute($otpcheck);
         $result = mysqli_stmt_get_result($otpcheck);
@@ -38,6 +38,7 @@ if ($apiKey != $expected_api_key) {
             $success = mysqli_fetch_array($result);
             $fullname = $success['fullname'];
             $role_id = $success['role_id'];
+            $department_id = $success['department_id'];
             $otp_expiry_time = $success['otp_expiry_time'];
 
             if (time() > strtotime($otp_expiry_time)) {
@@ -53,7 +54,7 @@ if ($apiKey != $expected_api_key) {
                 mysqli_stmt_execute($query);
 
                 $alert_description='SUCCESS ALERT: A USER WHOSE NAME IS '. $fullname. ' CHANGE HIS/HER PASSWORD';
-                $sequence = $callclass->_add_alert($conn, $staff_id, $role_id, $fullname, $alert_description, $system_name, $ip_address);
+                $sequence = $callclass->_add_alert($conn, $staff_id, $role_id, $department_id, $fullname, $alert_description, $system_name, $ip_address);
                
                 $response = [
                     'response' => 103,

@@ -42,7 +42,7 @@ if ($apiKey != $expected_api_key) {
 
         if ($expenses_id==''){
                 
-            $query = "SELECT * FROM `expenses_tab` WHERE $search_like LIMIT ?, ?";
+            $query = "SELECT a.*, FORMAT(a.expenses_amount, 2) AS formatted_expenses_amount, FORMAT(a.balance_before, 2) AS formatted_balance_before, FORMAT(a.balance_after, 2) AS formatted_balance_after FROM `expenses_tab` a WHERE $search_like LIMIT ?, ?";
             $stmt = mysqli_prepare($conn, $query);
             mysqli_stmt_bind_param($stmt, 'ii', $offset, $items_per_page);
             mysqli_stmt_execute($stmt);
@@ -61,7 +61,7 @@ if ($apiKey != $expected_api_key) {
                     'data' => $expenses_list,
                     'pagination' => [
                         'current_page' => $page,
-                        'total_student' => $total_expenses,
+                        'total_expenses' => $total_expenses,
                         'total_pages' => $total_pages,
                         'next_page' => ($page < $total_pages) ? $page + 1 : null,
                         'prev_page' => ($page > 1) ? $page - 1 : null
@@ -76,7 +76,7 @@ if ($apiKey != $expected_api_key) {
             }
 
         }else{
-            $query = "SELECT * FROM `expenses_tab` WHERE expenses_id=?";
+            $query = "SELECT a.*, FORMAT(a.expenses_amount, 2) AS formatted_expenses_amount, FORMAT(a.balance_before, 2) AS formatted_balance_before, FORMAT(a.balance_after, 2) AS formatted_balance_after FROM `expenses_tab` a WHERE expenses_id=?";
             $stmt = mysqli_prepare($conn, $query);
             mysqli_stmt_bind_param($stmt, 's', $expenses_id);
             mysqli_stmt_execute($stmt);

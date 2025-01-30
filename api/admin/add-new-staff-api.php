@@ -13,6 +13,7 @@ if($apiKey != $expected_api_key) {
     $check = $array[0]['check'];
     $login_staff_id = $array[0]['staff_id'];
     $login_role_id = $array[0]['role_id'];
+    $login_department_id = $array[0]['department_id'];
 
     $response['check'] = $check; 
 
@@ -106,7 +107,7 @@ if($apiKey != $expected_api_key) {
                             mysqli_stmt_execute($add_department);
 
                             $alert_description='SUCCESS ALERT: A USER WHOSE NAME IS '. $registrar_fullname. ' ADDED NEW ADMINISTRATOR WITH ID: '. $staff_id;
-                            $callclass->_add_alert($conn, $login_staff_id, $login_role_id, $registrar_fullname, $alert_description, $system_name, $ip_address);
+                            $callclass->_add_alert($conn, $login_staff_id, $login_role_id, $login_department_id, $registrar_fullname, $alert_description, $system_name, $ip_address);
 
                             $response = [
                                 'response' => 107,
